@@ -124,7 +124,7 @@ begin
                         current_state <= parity_stop_bit;
                         clk_count <= 0;
                         
-                        if(Rx_data = '1') then                --i due if con a servono perche a � integer e parity_temp � std_logic_vector
+                        if(Rx_data = '1') then
                             a := 1;
                         else
                             a := 0;
