@@ -15,14 +15,14 @@ use IEEE.NUMERIC_STD.ALL;
 
 --Reciver:
 entity CORE_UART_RX is
-    generic(parity: integer range 0 to 1 := 1;     --<INSERIRE VALORE VOLUTO
-            N: integer range 7 to 11 := 10; --da 5 a 9 bit dati e 2 bit start/stop e parity bit --<INSERIRE VALORE VOLUTO
-            frequency: integer := 27000000;        --<INSERIRE VALORE VOLUTO
-            baud_frequency: integer := 9600        --<INSERIRE VALORE VOLUTO
+    generic(parity: integer range 0 to 1 := 1;     --<INSERT VALUE
+            N: integer range 7 to 11 := 10; --from 5 to 9 data bits and 2 bits: start/stop and parity bit --<INSERT VALUE
+            frequency: integer := 27000000;        --<INSERT VALUE
+            baud_frequency: integer := 9600        --<INSERT VALUE
             );
     port(Rx_in, CLK, RESET: in std_logic;
          Flag, parity_flag: out std_logic;
-         Reg_out: out std_logic_vector(N-(2+parity)-1 downto 0) --N-(2+parity) � il valore dei bit - start, stop ed il bit di parit� se c'�
+         Reg_out: out std_logic_vector(N-(2+parity)-1 downto 0) --N-(2+parity) is the value of bits: - start, stop and eventualy parity
          );
 end CORE_UART_RX;
 
@@ -34,14 +34,12 @@ signal current_state: UART_SM := idle_bit;
 signal Rx_data: std_logic;
 signal buffer_reg: std_logic_vector(N-(2+parity)-1 downto 0) := (others => '0');
 signal N_data: integer := N-(2+parity);
-signal bit_index: integer range 0 to N-(2+parity) := 0; --non metto N_data -1 perch� in un if mi serve vada di 1 in pi�
+signal bit_index: integer range 0 to N-(2+parity) := 0;
 signal clk_frequency: integer := frequency;
 signal baud_rate: integer := baud_frequency;  
 signal clk_per_bit: integer := clk_frequency/baud_rate;
 signal clk_count: integer range 0 to (frequency/baud_frequency)-1 := 0;
 signal temp: integer range 0 to 1 := parity;
---signal parity_temp: integer := 0; --nel for  sono variabili nel process perchè devono essere aggiornate più volte
---signal a: integer := 0;
 
 
 
