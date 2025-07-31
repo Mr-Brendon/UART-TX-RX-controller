@@ -54,7 +54,6 @@ begin
     if(RESET = '0') then
         current_state <= idle_bit;
         Flag <= '0';
-        parity_flag <= '0';
         Reg_out <= (others => '0');
         clk_count <= 0;
         bit_index <= 0;
@@ -89,14 +88,14 @@ begin
                 Flag <= '0';
                 clk_count <= clk_count + 1;
                 
-                if(clk_count = clk_per_bit-1) then      ------------------------------------------------------
-                    if(bit_index < N_data-1) then       --metto il -1 e concludo lultimo bit mettendo anche il nuovo stato insieme, sennò che un stato in più
+                if(clk_count = clk_per_bit-1) then
+                    if(bit_index < N_data-1) then      
                         current_state <= data_bit;
                         clk_count <= 0;
                         buffer_reg(bit_index) <= Rx_data;
                         bit_index <= bit_index + 1;
                     else
-                        buffer_reg(bit_index) <= Rx_data;  --(Rx_data si può mettere fuori perchè sta sul if e l'else comunque non è sbagliato)aggiungo   questo così oltre ad andare avanti al prossimo colpo faccio anche l'ultimo bit
+                        buffer_reg(bit_index) <= Rx_data;
                         current_state <= parity_stop_bit;
                         clk_count <= 0;
                         bit_index <= 0;
@@ -108,7 +107,7 @@ begin
                 end if;
                 
             when parity_stop_bit => --doppio perche potrebbe non esserci il parity bit
-                if(parity = 0) then                           ---------parity = 0 � lo stop
+                if(parity = 0) then                           ---------if parity = 0 it is the stop_bit state
                     if(clk_count = clk_per_bit-1) then
                         current_state <= restore;
                         Flag <= '1';
@@ -119,9 +118,9 @@ begin
                         Flag <= '0';
                         clk_count <= clk_count + 1;
                     end if;
-                elsif(temp = 1) then                         ---------parity = 1, temp = 1 � il parity state
-                    if(clk_count = clk_per_bit-1) then        --ATTENZIONE devo effettivamente inserire il bit di parity che vede se disp o pari
-                        temp <= 0;                            --nel ricevitore � un comparatore che se ce paro o disp allora attiva un flag
+                elsif(temp = 1) then                         ---------parity = 1, temp = 1 is parity state
+                    if(clk_count = clk_per_bit-1) then
+                        temp <= 0;                            
                         current_state <= parity_stop_bit;
                         clk_count <= 0;
                         
@@ -131,7 +130,7 @@ begin
                             a := 0;
                         end if;
                         
-                        parity_temp := a;                   --il bit in rx_data ossia il parity entra nel conteggio
+                        parity_temp := a;          
                         a := 0;
                         for i in 0 to N-(2+parity)-1 loop
                             if (buffer_reg(i) = '1') then
@@ -139,12 +138,12 @@ begin
                             else
                                 a := 0;
                             end if;
-                        parity_temp := parity_temp + a;      --parity non cresce perchè l'aggiornamento è solo alla fine del process
+                        parity_temp := parity_temp + a;
                         end loop;
                         
                         a := 0; --resettiamo a
                         
-                        if(parity_temp mod 2 = 1) then --somma dei bit � giusta
+                        if(parity_temp mod 2 = 1) then
                             parity_flag <= '1';
                         else
                             parity_flag <= '0';
@@ -154,7 +153,7 @@ begin
                         Flag <= '0';
                         clk_count <= clk_count + 1;
                     end if;
-                else                                        ----------temp = 0 � lo stop
+                else                                        ----------temp = 0 is stop_bit state
                     if(clk_count = clk_per_bit-1) then
                         current_state <= restore;
                         Flag <= '1';
@@ -167,7 +166,7 @@ begin
                     end if;
                 end if;
                 
-            when restore =>      --alcuni sono ridondanti, Reg_out rimane del valore inviato, invece il flag deve essere preso in tempo
+            when restore =>
                 current_state <= idle_bit;
                 buffer_reg <= (others => '0');
                 Flag <= '0';
