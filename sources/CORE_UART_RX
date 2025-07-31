@@ -8,11 +8,9 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 --use UNISIM.VComponents.all;
 
---BAUD RATE supportati: 4800, 9600, 19.2K, 57.6K e 115.2K
---bit meno significativo lanciato per primo
---per l'uart usiamo una macchina a stati
---parity bit pari = 1
---sembra finito, mi sa frequency >> di baud_frequency per funzionare
+--BAUD RATE supported: 4800, 9600, 19.2K, 57.6K e 115.2K
+--parity bit is just eaven
+--frequency >> baud_frequency 
 
 
 --Reciver:
