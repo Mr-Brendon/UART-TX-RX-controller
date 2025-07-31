@@ -173,7 +173,6 @@ begin
                 clk_count <= 0;
                 temp <= parity;
                 bit_index <= 0;
-                --parity_flag <= '0';
                 parity_temp := 0;
             when others =>
                 current_state <= idle_bit;
