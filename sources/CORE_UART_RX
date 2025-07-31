@@ -47,30 +47,13 @@ begin
 
 Sample: Rx_data <= Rx_in;
 
---Sampsdle: process(CLK, RESET) --per ridurre stabilit�
---begin
---    if(RESET = '0') then
---            Rx_data_temp <= '0';
---            Rx_data <= '0';
---    else
---        if(rising_edge(CLK)) then
---            Rx_data_temp <= Rx_in;
---            Rx_data <= Rx_data_temp;
---        end if;
---    end if;
---end process;
-
---BISOGNA ANCORA METTERE APPOSTO LA A!!!!!
-
 SM_block: process(CLK, RESET)
-variable a, parity_temp: integer := 0; --variabili che si aggiornano più volte
+variable a, parity_temp: integer := 0;
 begin
---QUI CE DA LAVORARE
 
     if(RESET = '0') then
-        current_state <= idle_bit; --IMPORTANTE
+        current_state <= idle_bit;
         Flag <= '0';
-        --parity_flag <= '0'; il bit viene resettato o per meglio dire settato nuovamente poco prima del flag del buffer_reg così si ha tempo per prenderlo
         Reg_out <= (others => '0');
         clk_count <= 0;
         bit_index <= 0;
