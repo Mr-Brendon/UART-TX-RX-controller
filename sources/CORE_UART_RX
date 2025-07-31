@@ -54,6 +54,7 @@ begin
     if(RESET = '0') then
         current_state <= idle_bit;
         Flag <= '0';
+        parity_flag <= '0';
         Reg_out <= (others => '0');
         clk_count <= 0;
         bit_index <= 0;
