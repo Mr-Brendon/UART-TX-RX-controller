@@ -16,7 +16,7 @@ use IEEE.NUMERIC_STD.ALL;
 --Reciver:
 entity CORE_UART_RX is
     generic(parity: integer range 0 to 1 := 1;     --<INSERT VALUE
-            N: integer range 7 to 11 := 10; --from 5 to 9 data bits and 2 bits: start/stop and parity bit --<INSERT VALUE
+            N: integer range 7 to 12 := 10; --from 5 to 9 data bits and 2 bits: start/stop and parity bit --<INSERT VALUE
             frequency: integer := 27000000;        --<INSERT VALUE
             baud_frequency: integer := 9600        --<INSERT VALUE
             );
