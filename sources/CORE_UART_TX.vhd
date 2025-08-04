@@ -117,10 +117,9 @@ begin
                     if(clk_count = clk_per_bit-3) then
                         current_state <= restore;
                         clk_count <= 0;
-                        Flag <= '1';                   --il Flag poi vierne resettato perchè si prende veloce o con interrupt, il flag lo metto solo quando viene completata del tutto la trasmissione 
-                                                       --e lo resetto loso all'idle oltre che nel reset. Sono sufficienti due cicli di clock, perchè se servisse viene preso da interrupt, in quanto la trasmissione/ricezione
-                                                       -- stessa gia funziona senza il flag
-                    else                               --non serve il current_state perchè è gia in parity/stop
+                        Flag <= '1';                  
+                                                       
+                    else
                         clk_count <= clk_count + 1;
                     end if;
                 end if;
@@ -128,7 +127,7 @@ begin
             when restore =>
                 clk_count <= 0;
                 current_state <= idle_bit;
-                temp <= parity;                         --IMPORTANTE PERCHE' VIENE RESETTATO SOLO QUI
+                temp <= parity;                         --Important it is reset just here
                 bit_index <= 0;
             
             when others =>
