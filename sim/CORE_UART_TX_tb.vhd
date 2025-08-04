@@ -7,10 +7,10 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
 entity testbench is
-    generic(parity: integer range 0 to 1 := 1;     --<INSERIRE VALORE VOLUTO
-            N: integer range 8 to 12 := 10; --da 5 a 9 bit dati e 2 bit start/stop e parity bit --<INSERIRE VALORE VOLUTO
-            frequency: integer := 27000000;        --<INSERIRE VALORE VOLUTO
-            baud_frequency: integer := 9600        --<INSERIRE VALORE VOLUTO
+    generic(parity: integer range 0 to 1 := 1;
+            N: integer range 8 to 12 := 10;
+            frequency: integer := 27000000;
+            baud_frequency: integer := 9600
             );
 end testbench;
 
