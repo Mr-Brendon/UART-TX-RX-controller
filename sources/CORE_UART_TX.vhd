@@ -1,17 +1,17 @@
 ----------------------------------------------------------------------------------
 --
 ----------------------------------------------------------------------------------
---per il rx quando c'è il flag prendi la word in uscita, per il tx quando si attiva il flag, cambia la word di ingresso
+
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 --use IEEE.NUMERIC_STD.ALL;
 
 entity CORE_UART_TX is
-    generic(parity: integer range 0 to 1 := 1;     --<INSERIRE VALORE VOLUTO
-            N: integer range 8 to 12 := 10; --da 5 a 9 bit dati e 2 bit start/stop e parity bit --<INSERIRE VALORE VOLUTO
-            frequency: integer := 27000000;        --<INSERIRE VALORE VOLUTO
-            baud_frequency: integer := 9600        --<INSERIRE VALORE VOLUTO
+    generic(parity: integer range 0 to 1 := 1;     --<INSERT VALUE
+            N: integer range 8 to 12 := 10; --from 5 to 9 data bits and 2 bits start/stop and parity bit --<INSERT VALUE
+            frequency: integer := 27000000;        --<INSERT VALUE
+            baud_frequency: integer := 9600        --<INSERT VALUE
             );
     port(Reg_in: in std_logic_vector(N-(2+parity)-1 downto 0);
          CLK, RESET, start: in std_logic;
@@ -50,7 +50,7 @@ begin
             when idle_bit =>
                 Flag <= '0';
                 clk_count <= 0;
-                Rx_out <= '1';                         --differente rispetto al rx, perchè qui non devo tenere un valore ma mandare dati, quindi nell'idle forzo a 1
+                Rx_out <= '1';
                 if(start = '1') then
                     current_state <= start_bit;
                 else
@@ -80,11 +80,10 @@ begin
                     
                 else
                     clk_count <= clk_count + 1;
-                    --current_state <= data_bit; questo non serve perchè rimane data_bit
                 end if;
             
             when parity_stop_bit =>
-                if(parity = 0) then                    --parity = 0 => non c'è il parity quindi si va allo stop diretto
+                if(parity = 0) then                    --parity = 0 => no parity so stop_bit
                     Rx_out <= '1';                     --stop_bit;
                     Flag <= '1';
                     if(clk_count = clk_per_bit-3) then -- minus 3 because it is clk_per_bit-1 as usual, but it count 2 clk pulse (restore and next idle)
@@ -96,7 +95,7 @@ begin
                     end if;
                 elsif(temp = 1) then                 --parity = 1
                     for i in 0 to N-(2+parity)-1 loop       
-                            if(Reg_in(i) = '1') then   --DEVO SOMMARE PER IL PARITY EVEN BIT
+                            if(Reg_in(i) = '1') then
                                 parity_temp := parity_temp + 1;
                             end if;
                     end loop;
@@ -112,7 +111,7 @@ begin
                     else
                         clk_count <= clk_count + 1;
                     end if;
-                else                                   --qui è temp = 0;
+                else                                   --here it is temp = 0;
                                                        --QUI DEVO USCIRE ED AMDARE NEL RESET COME IN PARITY = 0 ossia stop_bit e tutti i flag
                     Rx_out <= '1';
                     if(clk_count = clk_per_bit-3) then
