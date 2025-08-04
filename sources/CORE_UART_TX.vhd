@@ -103,7 +103,7 @@ begin
                     end if;
                 elsif(temp = 1) then                 --parity = 1
                     for i in 0 to N-(2+parity)-1 loop       
-                            if(Reg_in(i) = '1') then
+                            if(Reg_data(i) = '1') then
                                 parity_temp := parity_temp + 1;
                             end if;
                     end loop;
