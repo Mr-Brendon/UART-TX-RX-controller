@@ -15,7 +15,7 @@ entity CORE_UART_TX is
             );
     port(Reg_in: in std_logic_vector(N-(2+parity)-1 downto 0);
          CLK, RESET, start: in std_logic;
-         Rx_out, Flag: out std_logic
+         Rx_out, Flag, buffer_stored: out std_logic
          );
 end CORE_UART_TX;
 
@@ -33,10 +33,13 @@ signal temp: integer range 0 to 1 := parity;
 
 begin
 
-Buffer_tx: process(current_state)                       --Reg_data is loaded each start_bit, so you can upload the next data from data_bit to idle
+Buffer_tx: process(current_state)                       --Reg_data is loaded each start_bit, so you can upload the next data from buffer_stored flag or Flag to the next one
 begin
     if(current_state = start_bit) then
         Reg_data <= Reg_in;
+        buffer_stored <= '1';
+    else
+        buffer_stored <= '0';
     end if;
 end process;
 
