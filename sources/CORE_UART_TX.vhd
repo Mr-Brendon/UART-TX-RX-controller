@@ -1,1 +1,146 @@
+----------------------------------------------------------------------------------
+--
+----------------------------------------------------------------------------------
+--per il rx quando c'è il flag prendi la word in uscita, per il tx quando si attiva il flag, cambia la word di ingresso
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+--use IEEE.NUMERIC_STD.ALL;
+
+entity CORE_UART_TX is
+    generic(parity: integer range 0 to 1 := 1;     --<INSERIRE VALORE VOLUTO
+            N: integer range 8 to 12 := 10; --da 5 a 9 bit dati e 2 bit start/stop e parity bit --<INSERIRE VALORE VOLUTO
+            frequency: integer := 27000000;        --<INSERIRE VALORE VOLUTO
+            baud_frequency: integer := 9600        --<INSERIRE VALORE VOLUTO
+            );
+    port(Reg_in: in std_logic_vector(N-(2+parity)-1 downto 0);
+         CLK, RESET, start: in std_logic;
+         Rx_out, Flag: out std_logic
+         );
+end CORE_UART_TX;
+
+architecture CORE_UART_TX_bh of CORE_UART_TX is
+
+type UART_SM is (idle_bit, start_bit, data_bit, parity_stop_bit, restore);
+signal current_state: UART_SM := idle_bit; 
+signal Reg_data: std_logic_vector(N-(2+parity)-1 downto 0);
+signal clk_count: integer range 0 to (frequency/baud_frequency)-1 := 0;
+signal clk_per_bit: integer := (frequency/baud_frequency)-1;
+signal bit_index: integer range 0 to N-(2+parity) := 0;
+signal N_data: integer := N-(2+parity);
+signal temp: integer range 0 to 1 := parity;
+
+
+begin
+
+Sample: Reg_data <= Reg_in;
+
+SM_block: process(CLK, RESET)
+variable parity_temp, a: integer := 0;
+begin
+
+    if(RESET = '0') then
+        Rx_out <= '1';
+        Flag <= '0';
+        clk_count <= 0;
+        
+    elsif(rising_edge(CLK)) then
+    
+        case current_state is
+            when idle_bit =>
+                Flag <= '0';
+                clk_count <= 0;
+                Rx_out <= '1';                         --differente rispetto al rx, perchè qui non devo tenere un valore ma mandare dati, quindi nell'idle forzo a 1
+                if(start = '1') then
+                    current_state <= start_bit;
+                else
+                    current_state <= idle_bit;
+                end if;
+            
+            when start_bit =>
+                Rx_out <= '0';
+                if(clk_count = (clk_per_bit-1)) then
+                    current_state <= data_bit;
+                    clk_count <= 0;
+                else
+                    current_state <= start_bit;
+                    clk_count <= clk_count + 1;
+                end if;
+            
+            when data_bit =>
+                Rx_out <= Reg_data(bit_index);
+                if(clk_count = (clk_per_bit-1)) then
+                    if(bit_index < N_data-1) then
+                        bit_index <= bit_index + 1;
+                    else
+                        current_state <= parity_stop_bit;
+                        bit_index <= 0;
+                    end if;
+                clk_count <= 0;
+                    
+                else
+                    clk_count <= clk_count + 1;
+                    --current_state <= data_bit; questo non serve perchè rimane data_bit
+                end if;
+            
+            when parity_stop_bit =>
+                if(parity = 0) then                    --parity = 0 => non c'è il parity quindi si va allo stop diretto
+                    Rx_out <= '1';                     --stop_bit;
+                    Flag <= '1';
+                    if(clk_count = clk_per_bit-3) then -- minus 3 because it is clk_per_bit-1 as usual, but it count 2 clk pulse (restore and next idle)
+                                                       --to sincronise exactly clk_per_bit to the next frame
+                        current_state <= restore;
+                        clk_count <= 0;
+                    else
+                        clk_count <= clk_count + 1;
+                    end if;
+                elsif(temp = 1) then                 --parity = 1
+                    for i in 0 to N-(2+parity)-1 loop       
+                            if(Reg_in(i) = '1') then   --DEVO SOMMARE PER IL PARITY EVEN BIT
+                                parity_temp := parity_temp + 1;
+                            end if;
+                    end loop;
+                    if(parity_temp mod 2 = 1) then --somma dei bit dispari
+                        Rx_out <= '1';
+                    else
+                        Rx_out <= '0';
+                    end if;
+                    parity_temp := 0;
+                    if(clk_count = clk_per_bit-1) then
+                        temp <= 0;
+                        clk_count <= 0;
+                    else
+                        clk_count <= clk_count + 1;
+                    end if;
+                else                                   --qui è temp = 0;
+                                                       --QUI DEVO USCIRE ED AMDARE NEL RESET COME IN PARITY = 0 ossia stop_bit e tutti i flag
+                    Rx_out <= '1';
+                    if(clk_count = clk_per_bit-3) then
+                        current_state <= restore;
+                        clk_count <= 0;
+                        Flag <= '1';                   --il Flag poi vierne resettato perchè si prende veloce o con interrupt, il flag lo metto solo quando viene completata del tutto la trasmissione 
+                                                       --e lo resetto loso all'idle oltre che nel reset. Sono sufficienti due cicli di clock, perchè se servisse viene preso da interrupt, in quanto la trasmissione/ricezione
+                                                       -- stessa gia funziona senza il flag
+                    else                               --non serve il current_state perchè è gia in parity/stop
+                        clk_count <= clk_count + 1;
+                    end if;
+                end if;
+                     
+            when restore =>
+                clk_count <= 0;
+                current_state <= idle_bit;
+                temp <= parity;                         --IMPORTANTE PERCHE' VIENE RESETTATO SOLO QUI
+                bit_index <= 0;
+            
+            when others =>
+                current_state <= idle_bit;
+            
+        end case;
+    
+    end if;
+
+end process;
+
+
+end CORE_UART_TX_bh;
 
