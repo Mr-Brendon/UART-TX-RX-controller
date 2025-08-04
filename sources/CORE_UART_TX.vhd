@@ -33,7 +33,12 @@ signal temp: integer range 0 to 1 := parity;
 
 begin
 
-Sample: Reg_data <= Reg_in;
+Buffer_tx: process(current_state)                       --Reg_data is loaded each start_bit, so you can upload the next data from data_bit to idle
+begin
+    if(current_state = start_bit) then
+        Reg_data <= Reg_in;
+    end if;
+end process;
 
 SM_block: process(CLK, RESET)
 variable parity_temp, a: integer := 0;
