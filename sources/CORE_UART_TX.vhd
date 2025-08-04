@@ -112,7 +112,7 @@ begin
                         clk_count <= clk_count + 1;
                     end if;
                 else                                   --here it is temp = 0;
-                                                       --QUI DEVO USCIRE ED AMDARE NEL RESET COME IN PARITY = 0 ossia stop_bit e tutti i flag
+                                                       --EXIT PARITY = 0 so stop_bit
                     Rx_out <= '1';
                     if(clk_count = clk_per_bit-3) then
                         current_state <= restore;
