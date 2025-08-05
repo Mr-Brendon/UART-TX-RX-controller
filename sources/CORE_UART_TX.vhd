@@ -51,6 +51,8 @@ begin
         Rx_out <= '1';
         Flag <= '0';
         clk_count <= 0;
+        temp <= parity;
+        current_state <= idle_bit;
         
     elsif(rising_edge(CLK)) then
     
