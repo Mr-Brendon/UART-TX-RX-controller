@@ -53,6 +53,7 @@ begin
         clk_count <= 0;
         temp <= parity;
         current_state <= idle_bit;
+        bit_index <= '0';
         
     elsif(rising_edge(CLK)) then
     
