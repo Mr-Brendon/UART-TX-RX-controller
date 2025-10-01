@@ -66,6 +66,7 @@ begin
             when idle_bit =>
                 Flag <= '0';
                 clk_count <= 0;
+                bit_index <= 0;
                 
                 if(Rx_data = '1') then
                     current_state <= idle_bit;
