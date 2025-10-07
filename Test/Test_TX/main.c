@@ -97,7 +97,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 	
 	
-	//set firts byte to receive
+	//set first byte to receive
 	Set_GPIOB_Pins_From_Buffer(TX_buffer, 0);
 	
 	//NO START
@@ -113,7 +113,7 @@ int main(void)
 	
 	if (HAL_UART_Receive_IT(&huart1, RX_buffer, sizeof(RX_buffer)) != HAL_OK)
 {
-    // Si è verificato un errore: lampeggia velocemente per segnalarlo
+    //error: toggle pin:
     while (1)
     {
         HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
